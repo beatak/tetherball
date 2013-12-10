@@ -1,6 +1,8 @@
 
 import os.path, argparse
+from config import Config
 import daemon
+import data
 import psutil #pypy...
 
 parser = argparse.ArgumentParser(description='Manage Tetherball application')
@@ -11,27 +13,14 @@ parser.add_argument(
     help='start/stop/restart watching Tetherball')
 args = parser.parse_args()
 
-PATH_CWD = os.path.expanduser('~')
-FILE_LOCKFILE = 'lockfile'
-
 def run_command (command):
-    PATH_TETHERBALL_BASE = os.path.join( PATH_CWD, '.tetherball' )
-    PATH_TETHERBALL_LOCK = os.path.join( PATH_TETHERBALL_BASE, FILE_LOCKFILE )
-
-    if os.path.exists( PATH_TETHERBALL_BASE ):
-        if not os.path.isdir( PATH_TETHERBALL_BASE ):
-            print "%s is not a directory? You may need to fix is manually" % PATH_TETHERBALL_BASE
-            exit( 1 )
-    else:
-        os.mkdir( PATH_TETHERBALL_BASE )
-
     if command == 'start':
-        command_start(PATH_TETHERBALL_LOCK)
+        command_start(Config.PATH_TETHERBALL_LOCK)
     elif command == 'stop':
-        command_stop(PATH_TETHERBALL_LOCK)
+        command_stop(Config.PATH_TETHERBALL_LOCK)
     else:
-        command_stop(PATH_TETHERBALL_LOCK)
-        command_start(PATH_TETHERBALL_LOCK)
+        command_stop(Config.PATH_TETHERBALL_LOCK)
+        command_start(Config.PATH_TETHERBALL_LOCK)
     exit( 0 )
 
 def command_start (lock):
