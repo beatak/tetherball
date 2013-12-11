@@ -1,15 +1,21 @@
 import json, sqlite3
-from config import Config
 
 class Data ():
-    def __init__ (self, config={}):
-        self.conn = sqlite3.connect(config.PATH_TETHERBALL_DB)
+    SQL_ENTRIES = """
+      CREATE TABLE IF NOT EXISTS
+        %s
+        ( 
+          timestamp INTEGER, 
+          repository_id INTEGER, 
+          path TEXT NOT NULL
+        );"""
 
-        cursor = self.conn.cursor()
-        
-        self.queue = None
-        self.standby = None
-        print 'yay'
+    def __init__ (self, config={}):
+        conn = sqlite3.connect(config.PATH_TETHERBALL_DB)
+        cursor = conn.cursor()
+        cursor.execute( self.SQL_ENTRIES % 'queues' )
+        cursor.execute( self.SQL_ENTRIES % 'standbys' )
+        self.connection = conn
 
     def refresh (self):
         #foo
@@ -28,7 +34,9 @@ class Data ():
         print 'requeue'
 
 if __name__ == "__main__":
+    from config import Config
     from debug_json import MyEncoder
+
     print json.dumps( Config, cls=MyEncoder )
 
     d = Data( config=Config )

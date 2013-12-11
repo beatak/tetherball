@@ -1,7 +1,7 @@
 import os.path
+import json
 
-class Config ():
-    i = 10
+class Config:
     pass
 
 Config.FILE_BASE     = '.tetherball'
@@ -18,4 +18,17 @@ if os.path.exists( Config.PATH_TETHERBALL_BASE ):
         exit( 1 )
 else:
     os.mkdir( Config.PATH_TETHERBALL_BASE )
+
+    # SQL_REPOSITORIES = """
+    #   CREATE TABLE IF NOT EXISTS
+    #     repositories
+    #     ( 
+    #       id INTEGER PRIMARY KEY AUTOINCREMENT,
+    #       name TEXT NOT NULL,
+    #       remote TEXT NOT NULL
+    #     );"""
+
+if __name__ == "__main__":
+    from debug_json import MyEncoder
+    print json.dumps( Config, cls=MyEncoder )
 
