@@ -12,6 +12,7 @@ class ConfigSerializer(JSONEncoder):
                 #     print "omit!"
             return result
         except Exception, e:
-            print e
-        return
+            # print "ConfigSerializer error: %s" % str(e)
+            pass
+        return None
 
