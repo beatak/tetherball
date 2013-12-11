@@ -29,6 +29,6 @@ else:
     #     );"""
 
 if __name__ == "__main__":
-    from debug_json import MyEncoder
-    print json.dumps( Config, cls=MyEncoder )
+    from config_serializer import ConfigSerializer
+    print json.dumps( Config, cls=ConfigSerializer )
 

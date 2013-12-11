@@ -1,6 +1,6 @@
 from json import JSONEncoder
 
-class MyEncoder(JSONEncoder):
+class ConfigSerializer(JSONEncoder):
     def default(self, o):
         try:
             result = {}

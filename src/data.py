@@ -35,9 +35,9 @@ class Data ():
 
 if __name__ == "__main__":
     from config import Config
-    from debug_json import MyEncoder
 
-    print json.dumps( Config, cls=MyEncoder )
+    # from config_serializer import ConfigSerializer
+    # print json.dumps( Config, cls=ConfigSerializer )
 
     d = Data( config=Config )
 
