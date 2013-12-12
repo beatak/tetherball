@@ -53,6 +53,7 @@ else:
     os.mkdir( Config.PATH_TETHERBALL_BASE )
 
 Config.repository = {}
+Config.lock = False
 
 # update config by saved thing
 if os.path.exists( Config.PATH_TETHERBALL_CONFIG ):

@@ -1,9 +1,11 @@
 
 import os.path, argparse
+import psutil #pypy...
+
 from config import Config
 import daemon
-import data
-import psutil #pypy...
+from data import Data
+from runner import Runner
 
 parser = argparse.ArgumentParser(description='Manage Tetherball application')
 parser.add_argument(
