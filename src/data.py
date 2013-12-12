@@ -17,21 +17,22 @@ class Data ():
         cursor.execute( self.SQL_ENTRIES % 'standbys' )
         self.connection = conn
 
-    def refresh (self):
-        #foo
-        print 'refresh'
-
-    def push (self, list_object):
+    def queue (self, list_object, force_standby=False):
         # if dispatcher is running, it'll push to standby
-        print 'push'
-
-    def pop (self):
-        # whatever
-        print 'pop'
+        print 'queue'
 
     def requeue (self):
         # pull all from standby and push it back to queue
         print 'requeue'
+
+    def dequeue (self):
+        # lock the db, read all from queues, if it goes right, call _move_queues, unlock the db
+        print 'pop'
+
+    def _move_queues (self):
+        # claer queues and move all from standbys to queue
+        print 'move'
+
 
 if __name__ == "__main__":
     from config import Config
