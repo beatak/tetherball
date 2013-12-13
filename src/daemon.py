@@ -176,7 +176,7 @@ def createDaemon():
    os.dup2(0, 1)			# standard output (1)
    os.dup2(0, 2)			# standard error (2)
 
-   return(0)
+   return os.getpid()
 
 if __name__ == "__main__":
 

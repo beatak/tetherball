@@ -1,53 +1,51 @@
-from cmd import Cmd
-from watcher import Watcher
+#! /usr/bin/env python
+
+import argparse, os.path, os, sys, time
 from notifier import Notifier
+from fsevents import Observer, Stream
+from config import Config
+import daemon
 
-# http://docs.python.org/2/library/cmd.html
-# http://stackoverflow.com/questions/10234595/python-cmd-module-parsing-values-from-line
+def run_process (path, name):
+    # daemonize
+    pid = daemon.createDaemon()
 
-class RunnerCmd(Cmd):
-    # prompt
-    # indentchars
-    # lastcmd
-    # intro
-    # doc_header
-    # misc_header
-    # undoc_header
-    # ruler
-    # use_rawinput
+    # since, it's daemon, you can't do print
+    n = Notifier( title='Tetherball' )
 
-    #def cmdloop(intro):
-    #def Cmd.onecmd (str):
-    #def default(line):
-    #def completedefault (text, line, begin_index, end_index):
-    #def precmd (line):
-    #def postcmd (stop, line):
-    #def preloop ():
-    #def postloop ():
+    # spit pid
+    try:
+        file_pid = open( os.path.join( Config.PATH_TETHERBALL_PROC, name ), 'w' )
+        file_pid.write( str(pid) )
+        file_pid.close()
+    except Exception, e:
+        n.message( message=("Failed to write pid into file: %s" % e) )
 
-    prompt = '> '
-    intro = 'OH HAIII'
+    # debug message
+    # n.message( message=("%s: %s" % (name, str( pid ))) )
 
-    def set_config (self, config=''):
-        print 'cmd confing: ' + config
- 
-    def onecmd(self, line):
-        print 'one command'
+    def callback(FileEvent):
+        # mask, cookie, name
+        n.message( message=("mask: %s, cookie: %s\npath: %s" % (FileEvent.mask, FileEvent.cookie, FileEvent.name)) )
 
-    def do_foo(self, arg):
-        print arg
+    observer = Observer()
+    observer.start()
+    stream = Stream(callback, path, file_events=True)
+    observer.schedule(stream)
 
 if __name__ == '__main__':
-    # should pass the config from here.
-    config = 'foo'
+    parser = argparse.ArgumentParser( description='Run Tetherball file change watcher' )
+    parser.add_argument( 'path', type=str, nargs=1, help='Tetherball will watch this path' )
+    parser.add_argument( '--name', type=str, help='You can set the name for the path' )
+    args = parser.parse_args()
+    path = args.path[0]
+    if not os.path.exists( path ):
+        print "The given path doesn't seem to exist: %s" % path
+        exit( 1 )
+    if args.name == None:
+        name = str( int(time.time()) )
+    else:
+        name = args.name
 
-    # n = Notifier( 'tether-ball' )
-    # n.message( 'oh yes' )
-
-    w = Watcher( config=config )
-    w.start()
-    w.stop()
-    runner = RunnerCmd()
-    runner.set_config( config )
-    runner.cmdloop()
+    run_process( path, name )
 

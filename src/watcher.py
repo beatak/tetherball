@@ -1,3 +1,5 @@
+# this will be killed, probably
+
 from notifier import Notifier
 from fsevents import Observer, Stream
 

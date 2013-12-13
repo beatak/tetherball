@@ -1,77 +1,55 @@
 
-import os.path, argparse
+import os.path, argparse, subprocess
 import psutil #pypy...
 
 from config import Config
 import daemon
 from data import Data
-from runner import Runner
 
-parser = argparse.ArgumentParser(description='Manage Tetherball application')
-parser.add_argument(
-    'command', 
-    type=str, 
-    nargs=1,
-    help='start/stop/restart watching Tetherball')
-args = parser.parse_args()
+path_origin = os.path.dirname( os.path.abspath( __file__ ) )
 
 def run_command (command):
+    # fixme: probably I should remove LOCK || not used anymore
     if command == 'start':
-        command_start(Config.PATH_TETHERBALL_LOCK)
+        command_start()
     elif command == 'stop':
-        command_stop(Config.PATH_TETHERBALL_LOCK)
+        command_stop()
     else:
-        command_stop(Config.PATH_TETHERBALL_LOCK)
-        command_start(Config.PATH_TETHERBALL_LOCK)
+        command_stop()
+        command_start()
     exit( 0 )
 
-def command_start (lock):
+def command_start ():
+    for name in Config.repository:
+        path_exec = os.path.join( path_origin, 'runner.py' )
+        path_local = str( Config.repository[name]['local'] )
+        try:
+            # this strcuture make name without a space...
+            subprocess.call(' '.join( [path_exec, path_local, '--name', name] ), shell=True)
+        except Exception, e:
+            print "Failed to spawn a new process: %s" % e
+
+def command_stop ():
     try:
-        ret_code = daemon.createDaemon()
-        pid = str( os.getpid() )
-        run_notifier()
-        file = open( lock, 'w' )
-        file.write( pid )
-        file.close()
+        procs = os.listdir( Config.PATH_TETHERBALL_PROC )
+        for proc in procs:
+            path_proc = os.path.join( Config.PATH_TETHERBALL_PROC, proc )
+            f = open( path_proc , 'r' )
+            pid = int( f.read() )
+            f.close()
+            psutil.Process( pid ).terminate()
+            os.unlink( path_proc )
     except Exception, e:
-        print e
+        print "Failed to stop daemons: %s" % e
         exit( 1 )
-
-def command_stop (lock):
-    if not os.path.exists( lock ):
-        print "It hasn't started yet?"
-        exit( 1 )
-    else:
-        file_pid = open( lock, 'r' )
-        pid = int( file_pid.read() )
-        psutil.Process(pid).terminate()
-        file_pid.close()
-        os.unlink( lock )
-
-        
-
-def run_notifier ():
-    from notifier import Notifier
-    from fsevents import Observer, Stream
-    n = Notifier(title='Tetherball testing')
-    path = '/Users/tmizohata/Repository'
-
-    def callback(FileEvent):
-        # mask, cookie, event
-        n.message( message=FileEvent.name)
-        print FileEvent
-
-    observer = Observer()
-    observer.start()
-    stream = Stream(callback, path, file_events=True)
-    observer.schedule(stream)
-
-
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser( description='Manage Tetherball application' )
+    parser.add_argument( 'command', type=str, nargs=1, help='start/stop/restart watching Tetherball' )
+    args = parser.parse_args()
+
     if args.command[0] in ('start', 'stop', 'restart'):
         run_command(args.command[0])
-        exit( 0 )
     else:
         print "Unknow command: %s" % args.command[0]
         parser.print_help()
