@@ -39,6 +39,7 @@ Config.FILE_LOCKFILE = 'lockfile'
 Config.FILE_CONFIG   = 'config.json'
 Config.FILE_DB       = 'sqlite.db'
 Config.FILE_PROC     = 'proc'
+Config.FILE_LOGGER   = 'tetherball.log'
 Config.PATH_USERDIR  = os.path.expanduser('~')
 
 Config.PATH_TETHERBALL_BASE   = os.path.join( Config.PATH_USERDIR,         Config.FILE_BASE     )
@@ -46,6 +47,7 @@ Config.PATH_TETHERBALL_LOCK   = os.path.join( Config.PATH_TETHERBALL_BASE, Confi
 Config.PATH_TETHERBALL_CONFIG = os.path.join( Config.PATH_TETHERBALL_BASE, Config.FILE_CONFIG   )
 Config.PATH_TETHERBALL_DB     = os.path.join( Config.PATH_TETHERBALL_BASE, Config.FILE_DB       )
 Config.PATH_TETHERBALL_PROC   = os.path.join( Config.PATH_TETHERBALL_BASE, Config.FILE_PROC     )
+Config.PATH_TETHERBALL_LOGGER = os.path.join( Config.PATH_TETHERBALL_BASE, Config.FILE_LOGGER   )
 
 if os.path.exists( Config.PATH_TETHERBALL_BASE ):
     if not os.path.isdir( Config.PATH_TETHERBALL_BASE ):
