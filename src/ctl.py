@@ -7,7 +7,7 @@ import daemon
 from data import Data
 from logger import Logger
 
-KNOWN_COMMAND = ('start', 'stop', 'restart', 'status', 'refresh_db', 'show_queues')
+KNOWN_COMMAND = ('start', 'stop', 'restart', 'status', 'refresh_db', 'show_queues', 'show_config')
 path_origin = os.path.dirname( os.path.abspath( __file__ ) )
 
 def run_command (command):
@@ -25,6 +25,8 @@ def run_command (command):
         command_refresh_db()
     elif command == 'show_queues':
         command_show_queues()
+    elif command == 'show_config':
+        command_show_config()
     exit( 0 )
 
 def command_start ():
@@ -86,6 +88,10 @@ def command_show_queues ():
     except Exception, e:
         print "Failed to run refresh db: %s" % e
         exit( 1 )
+
+def command_show_config ():
+    from config_serializer import ConfigSerializer
+    print json.dumps( Config, cls=ConfigSerializer, indent=2, sort_keys=True)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser( description='Manage Tetherball application' )
