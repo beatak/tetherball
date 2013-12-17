@@ -7,7 +7,7 @@ import daemon
 from data import Data
 from logger import Logger
 
-KNOWN_COMMAND = ('start', 'stop', 'restart', 'status', 'refresh_db', 'show_queues', 'show_config')
+KNOWN_COMMAND = ('start', 'stop', 'restart', 'status', 'refresh_db', 'show_queues', 'show_config', 'help')
 path_origin = os.path.dirname( os.path.abspath( __file__ ) )
 
 def run_command (command, args):
@@ -27,7 +27,14 @@ def run_command (command, args):
         command_show_queues()
     elif command == 'show_config':
         command_show_config()
+    elif command == 'help':
+        command_help()
     exit( 0 )
+
+def command_help ():
+    print "ctl.py accepts:"
+    for command in KNOWN_COMMAND:
+        print " * " + command
 
 def command_start ():
     for name in Config.repository:
