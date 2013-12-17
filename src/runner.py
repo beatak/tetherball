@@ -57,13 +57,13 @@ def _run_observer (path, repository):
             n.message( message=("time: %i, repo: %s, path: %s, mask: %s, cookie: %s" % (timestamp, repository, FileEvent.name, FileEvent.mask, FileEvent.cookie)) )
             l.debug( "FSEvent: repository(%s), event_path(%s), config(%s)" % (repository, event_path, json.dumps(Config.repository[repository]) ) )
 
-            # FIXME: this won't support * dir name...!
-            # FIXME: ignore should not start with / since event won't give it that way
-            # this should support...
+            # FIXME: this won't support * dir name. For example: "foo/*/bar"
+            # FIXME: ignore path should not start with "/". Bad => "/foo/", Good => "foo/" 
+            # FIXME: probably this path matching algo needs to be external and tests.
             for ignore_path in ignores:
                 arr_ignore_path = ignore_path.split( os.sep )
                 regex_matcher = regex_matchee = None
-                l.debug( 'matcher: %s dir: %i matchee: %s dir: %i' % (ignore_path, len(arr_ignore_path), event_path, len(arr_event_path)) )
+                # l.debug( 'matcher: %s (%i) matchee: %s (%i)' % (ignore_path, len(arr_ignore_path), event_path, len(arr_event_path)) )
 
                 if len( arr_ignore_path ) > 1:
                     basedir_ignore_path = os.sep.join( arr_ignore_path[0:-1] )
@@ -76,51 +76,44 @@ def _run_observer (path, repository):
                             # - ignore points to directory
                             # if the ignore path is a part of event, it's matched
                             if basedir_event_path.startswith( basedir_ignore_path ):
-                                l.debug( 'case 0.1' )
                                 is_matched = True
                             elif partial_basedir_ignore_path in basedir_ignore_path:
-                                l.debug( 'case 0.2' )
                                 is_matched = True                                
                         else:
                             # - ignore points to deep file
                             # if the ignore path is a part of event
                             # then blob match
                             if basedir_event_path.startswith( basedir_ignore_path ):
-                                l.debug( 'case 0.3' )
                                 regex_matcher = re.compile( fnmatch.translate(basename_ignore_path) )
                                 regex_matchee = basename_event_path
                             elif partial_basedir_ignore_path in basedir_ignore_path:
-                                l.debug( 'case 0.4' )
                                 regex_matcher = re.compile( fnmatch.translate(basename_ignore_path) )
                                 regex_matchee = basename_event_path
                     else:
                         # - ignore includes '/' and event path doesn't include '/'
-                        l.debug( 'case 1' )
                         pass
  
                 else:
                     if len( arr_event_path ) > 1:
                         # - ignore doesn't include '/' and event path includes '/'
-                        l.debug( 'case 2' )
                         regex_matcher = re.compile( fnmatch.translate(ignore_path) )
                         regex_matchee = basename_event_path
 
                     else:
                         # - ignore doesn't include '/' and event path doesn't include '/'
-                        l.debug( 'case 3' )
                         regex_matcher = re.compile( fnmatch.translate(ignore_path) )
                         regex_matchee = event_path
 
                 if is_matched or ((regex_matcher and regex_matchee) and regex_matcher.match( regex_matchee )):
                     is_matched = True
-                    l.debug( " ** %s matched to %s" % (event_path, ignore_path) )
+                    # l.debug( " ** %s matched to %s" % (event_path, ignore_path) )
                     continue
 
-
             if is_matched:
-                l.debug( "IGNORED: %s" % event_path )
+                # l.debug( "IGNORED: %s" % event_path )
+                pass
             else:
-                l.debug( "REGISTERED: %s" % event_path )
+                # l.debug( "REGISTERED: %s" % event_path )
                 d.queue( timestamp, [{'repository': repository, 'path': event_path }] )
 
         except Exception, e:
@@ -131,7 +124,6 @@ def _run_observer (path, repository):
     observer.start()
     stream = Stream(_callback, path, file_events=True)
     observer.schedule(stream)
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser( description='Run Tetherball file change watcher' )
