@@ -10,12 +10,12 @@ from logger import Logger
 KNOWN_COMMAND = ('start', 'stop', 'restart', 'status', 'refresh_db', 'show_queues', 'show_config')
 path_origin = os.path.dirname( os.path.abspath( __file__ ) )
 
-def run_command (command):
+def run_command (command, args):
     # fixme: probably I should remove LOCK || not used anymore
     if command == 'start':
         command_start()
     elif command == 'stop':
-        command_stop()
+        command_stop(args)
     elif command == 'restart':
         command_stop()
         command_start()
@@ -39,7 +39,7 @@ def command_start ():
         except Exception, e:
             print "Failed to spawn a new process: %s" % e
 
-def command_stop ():
+def command_stop (args):
     try:
         procs = os.listdir( Config.PATH_TETHERBALL_PROC )
         for proc in procs:
@@ -49,6 +49,28 @@ def command_stop ():
             f.close()
             psutil.Process( pid ).terminate()
             os.unlink( path_proc )
+    except psutil.NoSuchProcess, e:
+        if args.force:
+            result = []
+            try:
+                for proc in procs:
+                    mypath = os.path.join( Config.PATH_TETHERBALL_PROC, proc )
+                    os.unlink( mypath )
+                    result.append( ' * ' + mypath )
+            except Exception, e:
+                print "Failed to delete lockfiles: %s" % e
+                print "You might need to clean up %s directory manually" % Config.PATH_TETHERBALL_PROC
+                exit( 1 )
+            print "Removed files:"
+            print "\n".join( result )
+        else:
+            print "Failed to stop daemons: %s" % e
+            print "Try --force to remove lockfiles."
+        exit( 1 )
+    except psutil.AccessDenied, e:
+        print "Failed to stop daemons: %s" % e
+        print "You might need to do sudo."
+        exit( 1 )
     except Exception, e:
         print "Failed to stop daemons: %s" % e
         exit( 1 )
@@ -96,10 +118,11 @@ def command_show_config ():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser( description='Manage Tetherball application' )
     parser.add_argument( 'command', type=str, nargs=1, help='start/stop/restart watching Tetherball' )
+    parser.add_argument( '--force', action='store_true', help='when you do `stop --force`, Tetherball will delete lockfiles no matter what.'  )
     args = parser.parse_args()
 
     if args.command[0] in KNOWN_COMMAND:
-        run_command(args.command[0])
+        run_command(args.command[0], args)
     else:
         print "Unknow command: %s" % args.command[0]
         parser.print_help()

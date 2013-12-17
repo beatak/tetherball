@@ -25,7 +25,7 @@ class Config:
             exit(1)
 
         f = open( Config.PATH_TETHERBALL_CONFIG, 'w')
-        f.write( json.dumps(result) )
+        f.write( json.dumps(result, indent=2) )
         f.close()
 
     @staticmethod
@@ -79,7 +79,7 @@ if os.path.exists( Config.PATH_TETHERBALL_CONFIG ):
         Config.__dict__[k] = d[k]
 
 if __name__ == "__main__":
-    print "DEBUGING: " + json.dumps( Config, cls=ConfigSerializer )
+    print "DEBUGING: " + json.dumps( Config, cls=ConfigSerializer, indent=2 )
     try:
         Config.foobar = Config.foobar + 1
     except:
