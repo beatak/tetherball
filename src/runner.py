@@ -7,6 +7,9 @@ import daemon
 from config import Config
 from data import Data
 from notifier import Notifier
+from logger import Logger
+
+import json
 
 def run_process (path, repository):
     # daemonize
@@ -27,16 +30,29 @@ def run_process (path, repository):
     # debug message
     # n.message( message=("%s: %s" % (repository, str( pid ))) )
 
+    # FileEvent: mask, cookie, name
     def callback(FileEvent):
+        l = Logger(Config)        
         timestamp = int(time.time())
-        # mask, cookie, name
         n.message( message=("time: %i, repo: %s, path: %s, mask: %s, cookie: %s" % (timestamp, repository, FileEvent.name, FileEvent.mask, FileEvent.cookie)) )
+
         try:
-            # how do i implement filter!?
+            len_path_prefix = len( Config.repository[ repository ]['local'] )
+            relative_path = FileEvent.name[len_path_prefix:]
+
+            arr = os.path.split( relative_path )
+            if arr 
+
+
+            l.debug( "%s / %s (%s)" % (repository, relative_path, json.dumps(Config.repository[repository]) ) )
+
+
+
             d.queue( timestamp, [{'repository': repository, 'path': FileEvent.name }] )
 
         except Exception, e:
-            n.message( message=str(e) )
+            n.message( message=("Error on FileEvent callback: %s" % e) )
+            l.debug( "Error on FileEvent callback: %s" % e )
 
     observer = Observer()
     observer.start()

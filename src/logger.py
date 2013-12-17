@@ -13,6 +13,6 @@ class Logger():
 
 if __name__ == "__main__":
     from config import Config
-    log = Logger(Config)
-    log.debug( 'HEY BABY' )
+    l = Logger(Config)
+    l.debug( 'Mic check One Two. From logger.py' )
 
