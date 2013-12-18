@@ -9,7 +9,7 @@ from logger import Logger
 from notifier import Notifier
 import json
 
-def run_process (path, repository):
+def run (path, repository):
     #imports
     import daemon
 
@@ -137,4 +137,4 @@ if __name__ == '__main__':
         exit( 1 )
     repository = args.repository
 
-    run_process( path, repository )
+    run( path, repository )

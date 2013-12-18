@@ -38,7 +38,7 @@ def command_help ():
 
 def command_start ():
     for name in Config.repository:
-        path_exec = os.path.join( path_origin, 'runner.py' )
+        path_exec = os.path.join( path_origin, 'watcher.py' )
         path_local = str( Config.repository[name]['local'] )
         try:
             # this strcuture make name without a space...
