@@ -53,7 +53,7 @@ def run (repository):
             git.rm( ' '.join(action_rm) )
         if len(action_add) > 0 or len(action_rm) > 0:
             _t = int( time.time() )
-            git.commit( '-m "tetherball:%d"' % _t )
+            git.commit( '-m tetherball %d' % _t )
             git.push()
     except Exception, e:
         print "Failed to operate git: %s" % e
