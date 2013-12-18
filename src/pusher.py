@@ -47,8 +47,14 @@ def run (repository):
     # - git push
     git = sh.git.bake(_cwd=prefix_path)
     try:
-        git.add( ' '.join(action_add) )
-        git.rm( ' '.join(action_rm) )
+        if len(action_add) > 0:
+            git.add( ' '.join(action_add) )
+        if len(action_rm) > 0:
+            git.rm( ' '.join(action_rm) )
+        if len(action_add) > 0 or len(action_rm) > 0:
+            _t = int( time.time() )
+            git.commit( '-m "tetherball:%d"' % _t )
+            git.push()
     except Exception, e:
         print "Failed to operate git: %s" % e
         exit( 1 )
@@ -56,8 +62,6 @@ def run (repository):
     # - run notifier
     # - delete lock file
     # - check if there's standbys
-    
-    
 
     exit( 0 )
 
