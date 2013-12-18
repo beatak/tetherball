@@ -61,12 +61,14 @@ class Data ():
     def queue (self, timestamp, list, force_standby=False):
         # if dispatcher is running, it'll push to standby
         len_list = len( list )
+        sql =''
         if force_standby:
             repo = self.TABLE_STANDBYS
         else:
-            repo = self.TABLE_QUEUES
-
-        sql =''
+            if self.is_running():
+                repo = self.TABLE_STANDBYS
+            else:
+                repo = self.TABLE_QUEUES
         try:
             # n.message( message=('LEN: %i' % len_list) )
             if len_list == 0:
@@ -92,6 +94,9 @@ class Data ():
             connection.close()
         except Exception, e:
             self.log.debug( "Failed to issue sql on queue(): %s" % e )
+
+    def is_running (self):
+        return False
 
     def requeue (self):
         # pull all from standby and push it back to queue
