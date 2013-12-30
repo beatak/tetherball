@@ -10,6 +10,8 @@ from logger import Logger
 from notifier import Notifier
 import json
 
+NOTIFIER_TITLE='Tetherball:Pusher'
+
 def run (repository):
     print repository
 
@@ -17,9 +19,9 @@ def run (repository):
     # - maybe timeout?
 
     # - find if there's a lock file -- if there is, stop
-    # if os.path.exists( Config.PATH_TETHERBALL_PUSHER ):
-    #     print "locked!"
-    #     exit( 1 )
+    if os.path.exists( Config.PATH_TETHERBALL_PUSHER ):
+        print "locked!"
+        exit( 1 )
 
     # - create a lock file
     file_lock = open( Config.PATH_TETHERBALL_PUSHER, 'w' )
@@ -60,9 +62,17 @@ def run (repository):
         exit( 1 )
 
     # - run notifier
-    # - delete lock file
-    # - check if there's standbys
+    n = Notifier( title=NOTIFIER_TITLE )
+    n.message( message=("Files added: (%s) removed(%s)" % (", ".join(action_add), ", ".join(action_rm)) ) )
 
+    # - delete lock file
+    try:
+        os.unlink( Config.PATH_TETHERBALL_PUSHER )
+    except Exception, e:
+        print( "" )
+
+    # - check if there's standbys
+    # FIXME: implement this
     exit( 0 )
 
 

@@ -7,7 +7,7 @@ import daemon
 from data import Data
 from logger import Logger
 
-KNOWN_COMMAND = ('start', 'stop', 'restart', 'status', 'refresh_db', 'show_queues', 'show_config', 'help')
+KNOWN_COMMAND = ('start', 'stop', 'restart', 'status', 'refresh_db', 'show_queues', 'show_config', 'help', 'rotate_log')
 path_origin = os.path.dirname( os.path.abspath( __file__ ) )
 
 def run_command (command, args):
@@ -29,11 +29,15 @@ def run_command (command, args):
         command_show_config()
     elif command == 'help':
         command_help()
+    elif command == 'rotate_log':
+        command_rotate_log()
     exit( 0 )
 
 def command_help ():
     print "ctl.py accepts:"
-    for command in KNOWN_COMMAND:
+    mylist = list((KNOWN_COMMAND[:]))
+    mylist.sort()
+    for command in mylist:
         print " * " + command
 
 def command_start ():
@@ -116,6 +120,15 @@ def command_show_queues ():
         print json.dumps(result, indent=2)
     except Exception, e:
         print "Failed to run refresh db: %s" % e
+        exit( 1 )
+
+def command_rotate_log ():
+    try:
+        os.unlink( Config.PATH_TETHERBALL_LOGGER )
+        open( Config.PATH_TETHERBALL_LOGGER, 'a' ).close()
+        pass
+    except Exception, e:
+        print "Failed to rotate log: %s" % e
         exit( 1 )
 
 def command_show_config ():

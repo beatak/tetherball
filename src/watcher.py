@@ -9,6 +9,8 @@ from logger import Logger
 from notifier import Notifier
 import json
 
+NOTIFIER_TITLE = 'Tetherball:Watcher'
+
 def run (path, repository):
     #imports
     import daemon
@@ -24,7 +26,7 @@ def run (path, repository):
     except Exception, e:
         # l = Logger(Config)
         # l.debug( "Failed to write pid into file: %s" )
-        n = Notifier( title='Tetherball' )
+        n = Notifier( title=NOTIFIER_TITLE )
         n.message( message=("Failed to write pid into file: %s" % e) )
 
     # debug message
@@ -53,7 +55,7 @@ def _run_observer (path, repository):
 
             #debug
             l = Logger(Config)
-            n = Notifier( title='Tetherball' )
+            n = Notifier( title=NOTIFIER_TITLE )
             n.message( message=("time: %i, repo: %s, path: %s, mask: %s, cookie: %s" % (timestamp, repository, FileEvent.name, FileEvent.mask, FileEvent.cookie)) )
             l.debug( "FSEvent: repository(%s), event_path(%s), config(%s)" % (repository, event_path, json.dumps(Config.repository[repository]) ) )
 
