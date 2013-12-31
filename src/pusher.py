@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 
-import argparse, os.path, os, sys, time
-import sh
+import argparse, os.path, os, sys, time, subprocess, shutil
+import sh # pip
+
 from config import Config
 from data import Data
 
@@ -11,16 +12,13 @@ from notifier import Notifier
 import json
 
 NOTIFIER_TITLE='Tetherball:Pusher'
+SEC_SLEEP = 1.0
+COMMAND = 'ls -t %s | head -1' % Config.PATH_TETHERBALL_QUEUE
 
 def run (repository):
-    print repository
-
-    ##
-    # - maybe timeout?
-
     # - find if there's a lock file -- if there is, stop
     if os.path.exists( Config.PATH_TETHERBALL_PUSHER ):
-        print "locked!"
+        print( 'Lock file exists. If no pusher is running, delete %s maybe?' % Config.PATH_TETHERBALL_PUSHER )
         exit( 1 )
 
     # - create a lock file
@@ -28,6 +26,25 @@ def run (repository):
     file_lock.write( str( os.getpid() ) )
     file_lock.close()
 
+    # timeout
+    time.sleep( SEC_SLEEP )
+    try:
+        str_last = subprocess.check_output( COMMAND, shell=True )
+        ms_now = int( time.time() * 1000 )
+
+        if str_last != '':
+            ms_last = int( str_last.strip() )
+        else:
+            ms_last = ms_now - int(SEC_SLEEP * 1000) + 1
+
+        if (ms_now - ms_last) > (s_sleep * 1000):
+            _run_main()
+        else:
+            run()
+    except Exception, e:
+        l.debug( 'Failed on pusher.py: %s' % e)
+
+def _run_main ()
     # - take all queue
     d = Data( config=Config )
     queues = d.fetch_queues()
@@ -67,6 +84,10 @@ def run (repository):
 
     # - delete lock file
     try:
+        # delete all queues
+        shutil.rmtree( Config.PATH_TETHERBALL_QUEUE )
+        os.mkdir( Config.PATH_TETHERBALL_QUEUE )
+        # delete lock file
         os.unlink( Config.PATH_TETHERBALL_PUSHER )
     except Exception, e:
         print( "" )

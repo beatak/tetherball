@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
-import argparse, os.path, os, sys, time
-from fsevents import Observer, Stream # pypy
+import argparse, os.path, os, sys, time, subprocess
+from fsevents import Observer, Stream # pip
 from config import Config
 
 #debug
@@ -10,6 +10,7 @@ from notifier import Notifier
 import json
 
 NOTIFIER_TITLE = 'Tetherball:Watcher'
+path_origin = os.path.dirname( os.path.abspath( __file__ ) )
 
 def run (path, repository):
     #imports
@@ -117,6 +118,13 @@ def _run_observer (path, repository):
             else:
                 # l.debug( "REGISTERED: %s" % event_path )
                 d.queue( timestamp, [{'repository': repository, 'path': event_path }] )
+                #  make file-base queue
+                try:
+                    open( os.path.join( Config.PATH_TETHERBALL_QUEUE, str(int(time.time() * 1000))), 'w').close()
+                    path_exec = os.path.join( path_origin, 'pusher.py' )
+                    subprocess.Popen( path_exec )
+                except Exception, e:
+                    l.debug( 'Failed to run pusher?: %s' % e )
 
         except Exception, e:
             n.message( message=("Error on FileEvent callback: %s" % e) )
