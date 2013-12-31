@@ -4,7 +4,6 @@ import argparse, os.path, os, sys, time, subprocess
 from fsevents import Observer, Stream # pip
 from config import Config
 
-
 #debug
 from logger import Logger
 from notifier import Notifier
