@@ -53,7 +53,6 @@ def _run_main (repository):
     d.drop_table(True)
     d.init_table()
 
-
     #   - check if that exists, and if it does: add, if not: rm
     prefix_path = Config.repository[repository]['local']
     action_add = []
