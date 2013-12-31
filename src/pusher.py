@@ -6,6 +6,7 @@ import sh # pip
 from config import Config
 from data import Data
 
+
 #debug
 from logger import Logger
 from notifier import Notifier
@@ -15,11 +16,10 @@ NOTIFIER_TITLE='Tetherball:Pusher'
 SEC_SLEEP = 1.0
 COMMAND = 'ls -t %s | head -1' % Config.PATH_TETHERBALL_QUEUE
 
+
 def run (repository):
-    # - find if there's a lock file -- if there is, stop
-    if os.path.exists( Config.PATH_TETHERBALL_PUSHER ):
-        print( 'Lock file exists. If no pusher is running, delete %s maybe?' % Config.PATH_TETHERBALL_PUSHER )
-        exit( 1 )
+    n = Notifier( title=NOTIFIER_TITLE )
+    n.message( message=( "pusher::run( '%s' )" % repository ) )
 
     # - create a lock file
     file_lock = open( Config.PATH_TETHERBALL_PUSHER, 'w' )
@@ -35,16 +35,17 @@ def run (repository):
         if str_last != '':
             ms_last = int( str_last.strip() )
         else:
-            ms_last = ms_now - int(SEC_SLEEP * 1000) + 1
+            ms_last = ms_now - int(SEC_SLEEP * 1000) - 1
 
-        if (ms_now - ms_last) > (s_sleep * 1000):
-            _run_main()
+        if (ms_now - ms_last) > (SEC_SLEEP * 1000):
+            _run_main(repository)
         else:
-            run()
+            run(repository)
     except Exception, e:
+        l = Logger(Config)
         l.debug( 'Failed on pusher.py: %s' % e)
 
-def _run_main ()
+def _run_main (repository):
     # - take all queue
     d = Data( config=Config )
     queues = d.fetch_queues()
@@ -60,16 +61,16 @@ def _run_main ()
             action_add.append( relative_path )
         else:
             action_rm.append( relative_path )
-    print action_add
-    print action_rm
+    # print action_add
+    # print action_rm
 
     # - git push
     git = sh.git.bake(_cwd=prefix_path)
     try:
         if len(action_add) > 0:
-            git.add( ' '.join(action_add) )
+            git.add( *action_add )
         if len(action_rm) > 0:
-            git.rm( ' '.join(action_rm) )
+            git.rm( *action_rm )
         if len(action_add) > 0 or len(action_rm) > 0:
             _t = int( time.time() )
             git.commit( '-m tetherball %d' % _t )
@@ -105,6 +106,14 @@ if __name__ == '__main__':
     # print( dir( Config.repository ) )
     # print Config.repository.keys
     if not args.repository in Config.repository.iterkeys():
+        n = Notifier( title=NOTIFIER_TITLE )
+        n.message( message=( "`%s` doesn't seem to be registered to Tetherball." % args.repository ) )
         print "`%s` doesn't seem to be registered to Tetherball." % args.repository
         exit( 1 )
+
+    # - find if there's a lock file -- if there is, stop
+    if os.path.exists( Config.PATH_TETHERBALL_PUSHER ):
+        print( 'Lock file exists. If no pusher is running, delete %s maybe?' % Config.PATH_TETHERBALL_PUSHER )
+        exit( 1 )
     run( args.repository )
+

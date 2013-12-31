@@ -4,6 +4,7 @@ import argparse, os.path, os, sys, time, subprocess
 from fsevents import Observer, Stream # pip
 from config import Config
 
+
 #debug
 from logger import Logger
 from notifier import Notifier
@@ -122,7 +123,8 @@ def _run_observer (path, repository):
                 try:
                     open( os.path.join( Config.PATH_TETHERBALL_QUEUE, str(int(time.time() * 1000))), 'w').close()
                     path_exec = os.path.join( path_origin, 'pusher.py' )
-                    subprocess.Popen( path_exec )
+                    l.debug( 'WATCHER RUNS: %s' % path_exec )
+                    subprocess.Popen( [path_exec, repository] )
                 except Exception, e:
                     l.debug( 'Failed to run pusher?: %s' % e )
 
