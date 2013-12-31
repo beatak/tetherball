@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 import os.path, argparse, subprocess, json
 import psutil #pypy...
