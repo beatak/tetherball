@@ -11,7 +11,6 @@ from logger import Logger
 KNOWN_COMMAND = ('start', 'stop', 'restart', 'status', 'refresh_db', 'show_queues', 'show_config', 'help', 'rotate_log')
 path_origin = os.path.dirname( os.path.abspath( __file__ ) )
 
-
 def run_command (command, args):
     # fixme: probably I should remove LOCK || not used anymore
     if command == 'start':
