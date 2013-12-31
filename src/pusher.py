@@ -50,8 +50,9 @@ def _run_main (repository):
     d = Data( config=Config )
     queues = d.fetch_queues()
     # print json.dumps( queues, indent=2 )
+    d.drop_table(True)
+    d.init_table()
 
-    
 
     #   - check if that exists, and if it does: add, if not: rm
     prefix_path = Config.repository[repository]['local']
