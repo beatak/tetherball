@@ -10,8 +10,8 @@ from logger import Logger
 
 KNOWN_COMMAND = ('start', 'stop', 'restart', 'status', 'refresh_db', 'show_queues', 'show_config', 'help', 'rotate_log')
 path_origin = os.path.dirname( os.path.abspath( __file__ ) )
-if os.path.islink( path_origin ):
-    path_origin = os.path.realpath( path_origin )
+if os.path.islink( __file__ ):
+    path_origin = os.path.dirname( os.path.abspath( os.path.realpath( __file__ ) ) )
 
 def run_command (command, args):
     # fixme: probably I should remove LOCK || not used anymore
