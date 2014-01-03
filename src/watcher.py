@@ -11,6 +11,8 @@ import json
 
 NOTIFIER_TITLE = 'Tetherball:Watcher'
 path_origin = os.path.dirname( os.path.abspath( __file__ ) )
+if os.path.islink( path_origin ):
+    path_origin = os.path.realpath( path_origin )
 
 def run (path, repository):
     #imports
