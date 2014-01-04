@@ -123,11 +123,14 @@ def _run_observer (path, repository):
                 #  make file-base queue
                 try:
                     open( os.path.join( Config.PATH_TETHERBALL_QUEUE, str(int(time.time() * 1000))), 'w').close()
-                    path_exec = os.path.join( path_origin, 'pusher.py' )
+                    path_exec = os.path.join( path_origin, 'committer.py' )
                     l.debug( 'WATCHER RUNS: %s' % path_exec )
-                    subprocess.Popen( [path_exec, repository] )
+                    proc_commiter = subprocess.Popen( [path_exec, repository] )
+                    proc_commiter.communicate()
+                    if proc_commiter.returncode != 0:
+                        raise Exception ('Return code: %d' % proc_commiter.returncode)
                 except Exception, e:
-                    l.debug( 'Failed to run pusher?: %s' % e )
+                    l.debug( 'Failed to run committer?: %s' % e )
 
         except Exception, e:
             n.message( message=("Error on FileEvent callback: %s" % e) )

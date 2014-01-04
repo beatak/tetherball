@@ -12,17 +12,17 @@ from logger import Logger
 from notifier import Notifier
 import json
 
-NOTIFIER_TITLE='Tetherball:Pusher'
+NOTIFIER_TITLE='Tetherball:Committer'
 SEC_SLEEP = 1.0
 COMMAND = 'ls -t %s | head -1' % Config.PATH_TETHERBALL_QUEUE
 
 
 def run (repository):
     n = Notifier( title=NOTIFIER_TITLE )
-    n.message( message=( "pusher::run( '%s' )" % repository ) )
+    n.message( message=( "committer::run( '%s' )" % repository ) )
 
     # - create a lock file
-    file_lock = open( Config.PATH_TETHERBALL_PUSHER, 'w' )
+    file_lock = open( Config.PATH_TETHERBALL_COMMIT, 'w' )
     file_lock.write( str( os.getpid() ) )
     file_lock.close()
 
@@ -43,7 +43,7 @@ def run (repository):
             run(repository)
     except Exception, e:
         l = Logger(Config)
-        l.debug( 'Failed on pusher.py: %s' % e)
+        l.debug( 'Failed on committer.py: %s' % e)
 
 def _run_main (repository):
     # - take all queue
@@ -66,7 +66,7 @@ def _run_main (repository):
     # print action_add
     # print action_rm
 
-    # - git push
+    # - git commit
     git = sh.git.bake(_cwd=prefix_path)
     try:
         if len(action_add) > 0:
@@ -76,7 +76,7 @@ def _run_main (repository):
         if len(action_add) > 0 or len(action_rm) > 0:
             _t = int( time.time() )
             git.commit( '-m tetherball %d' % _t )
-            git.push()
+            # git.push()
     except Exception, e:
         print "Failed to operate git: %s" % e
         exit( 1 )
@@ -91,7 +91,7 @@ def _run_main (repository):
         shutil.rmtree( Config.PATH_TETHERBALL_QUEUE )
         os.mkdir( Config.PATH_TETHERBALL_QUEUE )
         # delete lock file
-        os.unlink( Config.PATH_TETHERBALL_PUSHER )
+        os.unlink( Config.PATH_TETHERBALL_COMMIT )
     except Exception, e:
         print( "" )
 
@@ -101,7 +101,7 @@ def _run_main (repository):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser( description='Run Tetherball git pusher' )
+    parser = argparse.ArgumentParser( description='Run Tetherball git committer' )
     parser.add_argument( 'repository', type=str, help='Name of the repository registered to Tetherball' )
 
     args = parser.parse_args()
@@ -114,8 +114,15 @@ if __name__ == '__main__':
         exit( 1 )
 
     # - find if there's a lock file -- if there is, stop
-    if os.path.exists( Config.PATH_TETHERBALL_PUSHER ):
-        print( 'Lock file exists. If no pusher is running, delete %s maybe?' % Config.PATH_TETHERBALL_PUSHER )
+    if os.path.exists( Config.PATH_TETHERBALL_COMMIT ):
+        print( 'Lock file exists. If no committer is running, delete %s maybe?' % Config.PATH_TETHERBALL_COMMIT )
         exit( 1 )
     run( args.repository )
+
+
+
+
+
+
+
 
