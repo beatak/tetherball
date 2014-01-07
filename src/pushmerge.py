@@ -67,9 +67,15 @@ def run (repository):
     )
 
     # getting remote branch
-    result = ssh.run(['git', 'symbolic-ref', 'HEAD', '--short'], cwd=remote_path)
+    # result = ssh.run(['git', 'symbolic-ref', 'HEAD', '--short'], cwd=remote_path)
+    result = ssh.run(['git', 'symbolic-ref', 'HEAD'], cwd=remote_path)
     if result.return_code != 0:
         log_error( 'Failed: %s - %s' % ('remote branch', result.stderr_output) )
+        exit( 1 )
+    try:
+        current_remote_branch = '/'.join( result.output.split('/')[2:] )
+    except Exception, e:
+        log_error( 'Failed: %s - %s' % ('remote branch name fetching', e) )
         exit( 1 )
 
     # check the remote branch status
@@ -79,10 +85,11 @@ def run (repository):
         if not 'working directory clean' in result.output:
             log_error( 'Failed: remote branch is not cleaned' )
             exit( 1 )
-    result = ssh.run(['git', 'checkout', remote_branch], cwd=remote_path)
-    if result.return_code != 0:
-        log_error( 'Failed: %s - %s' % ('remote branch switch', result.stderr_output) )
-        exit( 1 )
+    if current_remote_branch != remote_branch:
+        result = ssh.run(['git', 'checkout', remote_branch], cwd=remote_path)
+        if result.return_code != 0:
+            log_error( 'Failed: %s - %s' % ('remote branch switch', result.stderr_output) )
+            exit( 1 )
 
     # merge!
     result = ssh.run(['git', 'merge', current_branch], cwd=remote_path)
