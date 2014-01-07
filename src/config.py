@@ -36,6 +36,7 @@ class Config:
 
 Config.FILE_BASE    = '.tetherball'
 Config.FILE_COMMIT  = 'commit.lock'
+Config.FILE_PUSH    = 'push.lock'
 Config.FILE_CONFIG  = 'config.json'
 Config.FILE_DB      = 'sqlite.db'
 Config.FILE_PROC    = 'proc'
@@ -45,6 +46,7 @@ Config.PATH_USERDIR = os.path.expanduser('~')
 
 Config.PATH_TETHERBALL_BASE    = os.path.join( Config.PATH_USERDIR,         Config.FILE_BASE     )
 Config.PATH_TETHERBALL_COMMIT  = os.path.join( Config.PATH_TETHERBALL_BASE, Config.FILE_COMMIT   )
+Config.PATH_TETHERBALL_PUSH    = os.path.join( Config.PATH_TETHERBALL_BASE, Config.FILE_PUSH     )
 Config.PATH_TETHERBALL_CONFIG  = os.path.join( Config.PATH_TETHERBALL_BASE, Config.FILE_CONFIG   )
 Config.PATH_TETHERBALL_DB      = os.path.join( Config.PATH_TETHERBALL_BASE, Config.FILE_DB       )
 Config.PATH_TETHERBALL_PROC    = os.path.join( Config.PATH_TETHERBALL_BASE, Config.FILE_PROC     )

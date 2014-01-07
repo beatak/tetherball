@@ -6,7 +6,6 @@ import sh # pip
 from config import Config
 from data import Data
 
-
 #debug
 from logger import Logger
 from notifier import Notifier
@@ -118,11 +117,4 @@ if __name__ == '__main__':
         print( 'Lock file exists. If no committer is running, delete %s maybe?' % Config.PATH_TETHERBALL_COMMIT )
         exit( 1 )
     run( args.repository )
-
-
-
-
-
-
-
 
