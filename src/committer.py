@@ -15,6 +15,12 @@ NOTIFIER_TITLE='Tetherball:Committer'
 SEC_SLEEP = 1.0
 COMMAND = 'ls -t %s | head -1' % Config.PATH_TETHERBALL_QUEUE
 
+def log_error (msg):
+    n = Notifier( title=NOTIFIER_TITLE )
+    n.message( message=( msg ) )
+    l = Logger(Config)
+    l.debug( msg )
+    print(msg)
 
 def run (repository):
     n = Notifier( title=NOTIFIER_TITLE )
@@ -77,7 +83,7 @@ def _run_main (repository):
             git.commit( '-m tetherball %d' % _t )
             # git.push()
     except Exception, e:
-        print "Failed to operate git: %s" % e
+        log_error( "Failed to operate git: %s" % e )
         exit( 1 )
 
     # - run notifier
@@ -92,7 +98,7 @@ def _run_main (repository):
         # delete lock file
         os.unlink( Config.PATH_TETHERBALL_COMMIT )
     except Exception, e:
-        print( "" )
+        log_error( "Failed to delete lock file: %s" % e )
 
     # - check if there's standbys
     # FIXME: implement this
@@ -107,14 +113,12 @@ if __name__ == '__main__':
     # print( dir( Config.repository ) )
     # print Config.repository.keys
     if not args.repository in Config.repository.iterkeys():
-        n = Notifier( title=NOTIFIER_TITLE )
-        n.message( message=( "`%s` doesn't seem to be registered to Tetherball." % args.repository ) )
-        print "`%s` doesn't seem to be registered to Tetherball." % args.repository
+        log_error( "`%s` doesn't seem to be registered to Tetherball." % args.repository )
         exit( 1 )
 
     # - find if there's a lock file -- if there is, stop
     if os.path.exists( Config.PATH_TETHERBALL_COMMIT ):
-        print( 'Lock file exists. If no committer is running, delete %s maybe?' % Config.PATH_TETHERBALL_COMMIT )
+        log_error( 'Lock file exists. If no committer is running, delete %s maybe?' % Config.PATH_TETHERBALL_COMMIT )
         exit( 1 )
     run( args.repository )
 
