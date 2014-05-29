@@ -2,7 +2,7 @@
 
 # `git symbolic-ref HEAD --short` requires newer version of git
 
-import argparse
+import argparse, os.path, subprocess
 import sh #pip
 import spur #pip
 
@@ -12,7 +12,12 @@ from data import Data
 #debug
 from logger import Logger
 from notifier import Notifier
+
 NOTIFIER_TITLE='Tetherball:PushMerge'
+path_origin = os.path.dirname( os.path.abspath( __file__ ) )
+if os.path.islink( __file__ ):
+    path_origin = os.path.dirname( os.path.abspath( os.path.realpath( __file__ ) ) )
+
 
 def log_error (msg):
     n = Notifier( title=NOTIFIER_TITLE )
@@ -35,6 +40,24 @@ def run (repository):
         exit( 1 )
 
     git = sh.git.bake( _cwd=prefix_path )
+
+    # show status
+    try:
+        print git.status()
+    except Exception, e:
+        log_error( 'Failed to run status??: %s' % e )
+        exit( 1 )
+
+    # run commiter
+    try:
+        path_exec = os.path.join( path_origin, 'committer.py' )
+        proc_commiter = subprocess.Popen( [path_exec, repository] )
+        proc_commiter.communicate()
+        if proc_commiter.returncode != 0:
+            raise Exception ('Return code: %d' % proc_commiter.returncode)
+    except Exception, e:
+        log_error( 'Failed to run committer?: %s' % e )
+        exit( 1 )
 
     # get current branch
     try:
