@@ -16,12 +16,12 @@ Under the hood
 These tool use the other people's invention and I really appreciate them!
 
 - Python:
--- MacFSEvents
--- sqlite3
--- amoffat/sh (https://github.com/amoffat/sh/)
--- giampaolo/psutil (https://github.com/giampaolo/psutil)
--- mwilliamson/spur.py (https://github.com/mwilliamson/spur.py)
+ - MacFSEvents
+ - sqlite3
+ - amoffat/sh (https://github.com/amoffat/sh/)
+ - giampaolo/psutil (https://github.com/giampaolo/psutil)
+ - mwilliamson/spur.py (https://github.com/mwilliamson/spur.py)
 
 - Brew:
--- TerminalNotifier
+ - TerminalNotifier
 
